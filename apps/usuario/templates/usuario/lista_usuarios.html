@@ -1,0 +1,72 @@
+{% load static %}
+<!-- Columna izquierda -->
+<div class="col-md-6 d-flex">
+    <div class="card shadow-sm w-100 d-flex flex-column p-3">
+        <!-- 🔹 Encabezado con título y botón alineados -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0">
+                <i class="fa fa-users"></i> Usuarios
+            </h4>
+            {% if request.user.rol == "ADMINISTRADOR" or request.user.rol == "SUPERVISOR" %}
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAgregarUsuario">
+                <i class="fa fa-user-plus"></i> Agregar Usuario
+            </button>
+            {% endif %}         
+        </div>
+        <div class="mb-3">
+            <input type="text" id="busquedaUsuarios" class="form-control" placeholder="Buscar por usuario, rol o estado...">
+        </div>
+
+        <!-- 🔹 Tabla secundaria dentro de un box con border-radius -->
+        <div class="table-responsive flex-grow-1">
+            <table class="table table-striped table-hover mb-0 rounded shadow-sm" style="overflow: hidden;">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-center">Usuario</th>
+                        <th class="text-center">Rol</th>
+                        <th class="text-center">Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td class="text-center">{{ usuario.usuario|upper }}</td>
+                        <td class="text-center">{{ usuario.rol }}</td>
+                        <td class="text-center">
+                            {% if usuario.is_active == True %}
+                                ACTIVO
+                            {% else %}
+                                INACTIVO
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if request.user.id == 1 and usuario.id == 1 %}
+                                <i class="fa fa-lock text-secondary" data-bs-toggle="tooltip" title="No puedes editar tu usuario"></i>
+                            {% elif usuario.puede_ser_editado %}
+                                <button class="btn btn-sm btn-warning btn-editar" data-id="{{ usuario.id }}" title="Editar">
+                                    <i class="fa fa-chevron-right"></i>
+                                </button>
+                            {% else %}
+                                {% if request.user.id == usuario.id %}
+                                    <i class="fa fa-lock text-secondary" data-bs-toggle="tooltip" title="No puedes editar tu usuario"></i>
+                                {% else %}
+                                    <i class="fa fa-lock text-secondary" data-bs-toggle="tooltip" title="No tiene permisos"></i>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No hay usuarios registrados</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="{% static 'pdu/js/pdu_credenciales.js' %}"></script>
+<script src="{% static 'usuario/js/filtro_usuario.js' %}"></script>
+<!-- Modal: Agregar Usuario -->
+{% include "usuario/form_agregar_usuario.html" %}

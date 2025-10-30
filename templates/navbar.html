@@ -1,0 +1,73 @@
+{% load static %}
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand p-0 m-0" href="{% url 'dashboard' %}">
+      <img src="{% static 'img/logo.png' %}" alt="Logo" class="img-fluid" style="max-height: 40px;">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-5">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'dashboard' %}">
+            <i class="fa fa-bar-chart"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'pdu' %}">
+            <i class="fa fa-desktop me-1"></i> Monitoreo
+          </a>
+        </li>
+        {% if request.user.rol == "ADMINISTRADOR" or request.user.rol == "SUPERVISOR" %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            <i class="fa fa-cogs me-1"></i> Admin
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+            <li>
+              <a class="dropdown-item" href="{% url 'listado_marca' %}">
+                Registrar marca y<br>modelo
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="{% url 'gestion_usuario' %}">
+                Gestión de usuarios
+              </a>
+            </li>
+          </ul>
+        </li>
+        {% endif %} 
+      </ul>
+      
+      <!-- 🔽 Parte derecha del navbar -->
+      <ul class="navbar-nav ms-auto align-items-center">
+        {% if user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+              <i class="fa fa-user-circle me-1"></i>
+              {{ user.usuario|upper }} - {{ user.rol|slice:":3"|upper }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#cambiarPasswordModal">
+                  Cambiar contraseña
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'logout' %}">
+                  <i class="fa fa-sign-out"></i> Salir
+                </a>
+              </li>
+            </ul>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+{% include "usuario/cambiar_contraseña.html" %}

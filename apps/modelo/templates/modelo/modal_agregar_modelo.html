@@ -1,0 +1,48 @@
+{% load static %}
+<div class="modal fade" id="agregarModeloModal" tabindex="-1" aria-labelledby="agregarMarcaLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'modelo_agregar' %}"> 
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="agregarMarcaLabel">Agregar Modelo</h5>
+        </div>
+        <div class="modal-body">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-danger py-2" role="alert">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+          <div class="mb-3">
+            <label for="nombreMarca" class="form-label">Modelo</label>
+            <input type="text" class="form-control" id="nombreModelo" name="nombre" required>
+          </div>
+          <div class="mb-3">
+            <label for="modeloSelect" class="form-label">Nombre de la marca</label>
+            <select class="form-select" id="marcaSelect" name="marca" required>
+              <option value="">-- Seleccionar Marca --</option>
+              {% for marca in marcas %}
+                <option value="{{ marca.id }}">{{ marca.dispositivo }} {{ marca.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% if abrir_modal_modelo %}
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var modal_modelo = new bootstrap.Modal(document.getElementById('agregarModeloModal'));
+      modal_modelo.show();
+    });
+  </script>
+{% endif %}

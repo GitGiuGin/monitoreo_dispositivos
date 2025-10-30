@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-fluid mt-3 mb-3" style="height: calc(100vh - 90px);">
+    <!-- Título principal -->
+    <div class="row mb-2">
+        <div class="col d-flex align-items-center">
+            <div>
+                <h1 class="mb-0">
+                    <i class="fa fa-users"></i> Gestión de Usuarios
+                </h1>
+                <p class="text-muted mb-0">Desde aquí puedes administrar todos los usuarios del sistema, asignar roles y gestionar sus permisos.</p>
+            </div>
+
+            <!-- Bloque de mensajes -->
+            {% if messages %}
+            <div class="ms-auto">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} d-inline-block p-1 px-2 mb-0" role="alert" style="font-size: 0.9rem;">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Fila principal con columnas izquierda/derecha -->
+    <div class="row g-4" style="height: calc(100% - 80px);">
+        <!-- Columna izquierda -->
+        {% include "usuario/lista_usuarios.html" with usuarios=usuarios %}
+
+        <!-- Columna derecha -->
+        {% include "usuario/detalles_usuario.html" %}
+    </div>
+</div>
+<script src="{% static 'usuario/js/form_editar_usuario.js' %}"></script>
+<script src="{% static 'usuario/js/tiempo_mensaje.js' %}"></script>
+{% endblock %}

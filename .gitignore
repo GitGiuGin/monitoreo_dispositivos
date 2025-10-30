@@ -1,0 +1,49 @@
+# === Django ===
+*.pyc
+__pycache__/
+db.sqlite3
+/staticfiles/
+/media/
+*.log
+
+# === Entorno virtual ===
+venv/
+env/
+.venv/
+
+# === Archivos de configuración local ===
+.env
+*.env
+
+# === Archivos temporales o de sistema ===
+*.pid
+*.seed
+*.swp
+*.bak
+.DS_Store
+Thumbs.db
+
+# === IDEs y editores ===
+.vscode/
+.idea/
+*.code-workspace
+
+# === Docker ===
+# Evita logs o archivos generados en runtime
+*.pid
+*.log
+*.tmp
+
+# === Archivos de compilación o cache ===
+*.egg-info/
+*.egg/
+build/
+dist/
+
+# === Tests ===
+.coverage
+.pytest_cache/
+htmlcov/
+
+# === Windows ===
+desktop.ini

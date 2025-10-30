@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Listado de equipos</h2>
+        {% if user.rol != 'USUARIO' %}
+        <a href="{% url 'pdu_agregar' %}" class="btn btn-success">
+            <i class="fa fa-plus"></i> Agregar dispositivo
+        </a>
+        {% endif %}
+    </div>
+    <form method="get" class="row g-2 align-items-center mb-4 d-flex flex-wrap">
+        <input type="hidden" name="page" value="{{ page_obj.number }}">
+        <div class="col-auto">
+            <input type="text" name="marca" value="{{ marca }}" class="form-control" placeholder="Marca">
+        </div>
+        <div class="col-auto">
+            <input type="text" name="nfb" value="{{ nfb }}" class="form-control" placeholder="NFB">
+        </div>
+        <div class="col-auto">
+            <input type="text" name="serie" value="{{ serie }}" class="form-control" placeholder="Serie">
+        </div>
+        <div class="col-auto">
+            <select name="admin" class="form-control">
+                <option value="">-- Administrable --</option>
+                <option value="True" {% if admin == "True" %}selected{% endif %}>Sí</option>
+                <option value="False" {% if admin == "False" %}selected{% endif %}>No</option>
+            </select>
+        </div>
+        <div class="col-auto d-flex">
+            <button type="submit" class="btn btn-primary me-2">Buscar</button>
+            <a href="{% url 'pdu' %}" class="btn btn-secondary">Limpiar</a>
+        </div>
+        {% if messages %}
+        <div class="col-auto d-flex align-items-center ms-auto">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-0 py-1 px-2" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </form>
+    <div id="tabla-container">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <!-- Selector de items -->
+            <div>
+                <label for="items" class="me-2">Mostrar:</label>
+                <select id="items" name="items" class="form-select d-inline-block w-auto">
+                    <option value="10" {% if items == 10 %}selected{% endif %}>10</option>
+                    <option value="20" {% if items == 20 %}selected{% endif %}>20</option>
+                    <option value="50" {% if items == 50 %}selected{% endif %}>50</option>
+                </select>
+                <span id="mensaje-datos" data-total="{{ total_datos }}" data-mostrados="{{ datos_mostrados }}" class="ms-3">
+                    Mostrando {{ datos_mostrados }} de {{ total_datos }} dispositivos
+                </span>
+            </div>
+
+            <!-- Paginación -->
+            <ul class="pagination mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.previous_page_number }}&items={{ items }}&marca={{ marca }}&nfb={{ nfb }}&serie={{ serie }}&admin={{ admin }}">Anterior</a>
+                </li>
+                {% endif %}
+
+                {% for num in rango_paginas %}
+                <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+                    <a class="page-link"
+                        href="?page={{ num }}&items={{ items }}&marca={{ marca }}&nfb={{ nfb }}&serie={{ serie }}&admin={{ admin }}">
+                        {{ num }}</a>
+                </li>
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.next_page_number }}&items={{ items }}&marca={{ marca }}&nfb={{ nfb }}&serie={{ serie }}&admin={{ admin }}">Siguiente</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+
+    
+        <!-- Tabla dinamica -->
+        <table class="table table-striped">
+            <thead class="text-center">
+                <tr>
+                    <th>Adm</th>
+                    <th>Tipo</th>
+                    <th>Ubicación</th>
+                    <th>Ciudad</th>
+                    <th>Regional</th>
+                    <th>Dispositivo</th>
+                    <th>Marca</th>
+                    <th>NFB</th>
+                    <th>Serie</th>
+                    <th>
+                        <i class="fa fa-external-link"></i> IP
+                    </th>
+                    <th>Estado</th>
+                    {% if user.rol != 'USUARIO' %}
+                    <th>Acciones</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for pdu in pdus %}
+                <tr>
+                    <td class="text-center">
+                        {% if pdu.admin %}
+                        ✅
+                        {% else %}
+                        ❌
+                        {% endif %}
+                    </td>
+                    <td class="text-center">{{ pdu.ubicacion.tipo }}</td>
+                    <td>{{ pdu.ubicacion.nombre }}</td>
+                    <td class="text-center">{{ pdu.ubicacion.ciudad.nombre }}</td>
+                    <td class="text-center">{{ pdu.regional.nombre }}</td>
+                    <td class="text-center">{{ pdu.modelo.marca.dispositivo }}</td>
+                    <td>
+                        {{ pdu.modelo.marca.nombre }} {{ pdu.modelo.nombre }}
+                    </td>
+                    <td class="text-end">{{ pdu.nfb|default:" " }}</td>
+                    <td>{{ pdu.serie|default:" " }}</td>
+                    <td class="text-center">
+                        {% if user.rol != 'USUARIO' %}
+                            {% if pdu.ip %}
+                            <a href="http://{{ pdu.ip }}" target="_blank" style="text-decoration: none; color: #0d6efd;"
+                                data-bs-toggle="tooltip" data-bs-html="true"
+                                {% if request.user.rol == "ADMINISTRADOR" or request.user.rol == "SUPERVISOR" %}
+                                    title="Usuario: <b>{{ pdu.usuario }}</b><br>Clave: <b>{{ pdu.clave }}</b>"
+                                {% endif %}>
+                                {{ pdu.ip }}
+                            </a>
+                            {% endif %}
+                        {% else %}
+                            <a>{{ pdu.ip|default:"" }}</a>
+                        {% endif %}
+                    </td>
+                    <td class="text-center" id="estado-{{ pdu.id }}">
+                        {% if pdu.ip %}
+                        <span class="badge bg-secondary">Verificando...</span>
+                        {% else %}
+                        <span class="text-muted">Sin IP</span>
+                        {% endif %}
+                    </td>
+                    {% if user.rol != 'USUARIO' %}
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#modalEditar{{ pdu.id }}" title="Editar">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        {% if request.user.rol == "ADMINISTRADOR" or request.user.rol == "SUPERVISOR" %}
+                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#confirmEliminarModal{{ pdu.id }}" title="Eliminar">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr class="text-center">
+                    <td colspan="12">No hay PDUs registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div id="contenedorModales">
+            {% for pdu in pdus %}
+                {% include 'pdu/eliminar_pdu.html' with pdu=pdu %}
+                {% include 'pdu/error_ip.html' %}
+                {% include 'pdu/editar_pdu.html' with messages=messages %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+<script>
+document.getElementById('items').addEventListener('change', function() {
+    const url = new URL(window.location.href);
+    url.searchParams.set('items', this.value);
+    url.searchParams.set('page', 1); // reset a la primera página
+    window.location.href = url;
+});
+</script>
+
+<script src="{% static 'pdu/js/filtros_tabla.js' %}"></script>
+<script src="{% static 'pdu/js/pdu_credenciales.js' %}"></script>
+<script src="{% static 'pdu/js/tiempo_mensaje.js' %}"></script>
+<script src="{% static 'pdu/js/ping_estado.js' %}"></script>
+<script src="{% static 'pdu/js/ip_click.js' %}"></script>
+
+{% if request.GET.modal_abierto %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const modalId = "{{ request.GET.modal_abierto }}";
+    const modalEl = document.getElementById("modalEditar" + modalId);
+    if (modalEl) {
+        new bootstrap.Modal(modalEl).show();
+    }
+});
+</script>
+{% endif %}
+
+{% endblock %}

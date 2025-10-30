@@ -1,0 +1,44 @@
+<!-- Modal: Agregar Usuario -->
+<div class="modal fade" id="modalAgregarUsuario" tabindex="-1" aria-labelledby="modalAgregarUsuarioLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{% url 'crear_usuario' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAgregarUsuarioLabel">Agregar Usuario</h5>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Usuario -->
+                    <div class="mb-3">
+                        <label for="usuario" class="form-label">Nombre de usuario</label>
+                        <input type="text" class="form-control" id="usuario" name="usuario" required>
+                    </div>
+
+                    <!-- Contraseña -->
+                    <div class="mb-3">
+                        <label for="contraseña" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="contraseña" name="contraseña" required>
+                    </div>
+
+                    <!-- Rol -->
+                    <div class="mb-3">
+                        <label for="rol" class="form-label">Rol</label>
+                        <select class="form-select" id="rol" name="rol" required>
+                            <option value="">Seleccione un rol</option>
+                            {% for rol in roles %}
+                            <option value="{{ rol }}">{{ rol|title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

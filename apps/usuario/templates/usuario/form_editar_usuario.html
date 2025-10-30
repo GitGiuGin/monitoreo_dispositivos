@@ -1,0 +1,43 @@
+<!-- Form principal: editar usuario -->
+<form id="formEditarUsuario" method="POST" action="{% url 'editar_usuario' usuario.id %}">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label">Usuario</label>
+        <input type="text" name="usuario" class="form-control" value="{{ usuario.usuario|upper }}" readonly>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Rol</label>
+        <select name="rol" class="form-select">
+            {% for rol in user.puede_crear_roles %}
+                <option value="{{ rol }}" {% if usuario.rol == rol %}selected{% endif %}>
+                    {{ rol|capfirst }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Estado</label>
+        <select name="estado" class="form-select">
+            <option value="1" {% if usuario.is_active %}selected{% endif %}>ACTIVO</option>
+            <option value="0" {% if not usuario.is_active %}selected{% endif %}>INACTIVO</option>
+        </select>
+    </div>
+</form>
+
+<!-- Botones alineados a la derecha -->
+<div class="d-flex justify-content-end mt-3">
+    <!-- Botón de reinicio de contraseña (form separado) -->
+    <form method="POST" action="{% url 'resert_password' usuario.id %}" class="me-2">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-warning">
+            <i class="fa fa-refresh"></i> Reiniciar contraseña
+        </button>
+    </form>
+
+    <!-- Botón de guardar cambios, que hace submit del form de edición -->
+    <button class="btn btn-primary" type="submit" form="formEditarUsuario">
+        Actualizar
+    </button>
+</div>

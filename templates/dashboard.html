@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="bg-light p-4 rounded-3 shadow-sm mb-4 text-center">
+        <h2><i class="fa fa-bar-chart"></i> Monitoreo de Infraestructura</h2>
+        <p class="text-muted mb-0">
+            Visualiza el estado general de los diferentes dispositivos administrables, su distribución por región y ciudad.
+        </p>
+    </div>
+    <hr>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        {% include "pdu/dashboard/todos_dispositivos.html" %}
+        {% include "pdu/dashboard/por_ciudad.html" %}
+        {% include "pdu/dashboard/por_regional.html" %}
+        {% include "pdu/dashboard/disp_adm.html" %}
+        {% include "pdu/dashboard/disp_adm_reg.html" %}
+        {% include "pdu/dashboard/disp_adm_ip.html" %}
+    </div>
+</div>
+
+{% if mostrar_modal %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const modal = new bootstrap.Modal(document.getElementById('cambiarPasswordModal'));
+    modal.show();
+});
+</script>
+{% endif %}
+<script src="{% static 'pdu/js/tiempo_mensaje.js' %}"></script>
+<!-- Chart.js -->
+<script src="{% static 'js/chart.umd.min.js' %}"></script>
+{% include "pdu/dashboard/var_dash.html" %}
+<script type="module" src="{% static 'pdu/js/dashboard/total_dispositivos.js' %}"></script>
+<script type="module" src="{% static 'pdu/js/dashboard/por_ciudad.js' %}"></script>
+<script type="module" src="{% static 'pdu/js/dashboard/por_regional.js' %}"></script>
+<script src="{% static 'pdu/js/dashboard/disp_adm.js' %}"></script>
+<script type="module" src="{% static 'pdu/js/dashboard/disp_adm_reg.js' %}"></script>
+<script src="{% static 'pdu/js/dashboard/disp_adm_ip.js' %}"></script>
+{% endblock %}
