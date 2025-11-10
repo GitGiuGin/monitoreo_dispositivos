@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
+from urllib.parse import parse_qs, urlencode
 import subprocess
 from . import controller
 from apps.modelo.controller import listar_modelos
@@ -26,7 +27,6 @@ def listado_pdu(request):
 
     filtrados = []
     for pdu in pdus:
-        # Obtener valores seguros (evita errores si son None)
         nombre_marca = getattr(getattr(pdu.modelo, 'marca', None), 'nombre', '') or ''
         nombre_modelo = getattr(pdu.modelo, 'nombre', '') or ''
         nfb_valor = getattr(pdu, 'nfb', '') or ''
@@ -69,7 +69,7 @@ def listado_pdu(request):
     rango_paginas = range(start, end + 1)
     
     datos = {
-        'pdus': page_obj.object_list,  # muestra solo los del rango actual
+        'pdus': page_obj.object_list,
         'page_obj': page_obj,
         'items': items_por_pagina,
         'rango_paginas': rango_paginas,
@@ -84,24 +84,20 @@ def listado_pdu(request):
         'admin': admin,
     }
 
-    # Si viene por AJAX devolvemos solo el cuerpo de la tabla
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return render(request, 'pdu/listado_pdu.html', datos)
 
-    # Caso normal: render completo
     return render(request, "pdu/listado_pdu.html", datos)
 
 @login_required
 def agregar_pdu(request):
     if request.method == "POST":
         try:
-            # Recuperar datos del formulario
             nombre_ubicacion = request.POST.get("nombre").title()
             tipo = request.POST.get("tipo").title()
             ciudad_id = request.POST.get("ciudad")
             admin = request.POST.get("admin") == "on"
             
-            # Validaciones básicas
             if not nombre_ubicacion or not tipo or not ciudad_id:
                 messages.error(request, "Todos los campos obligatorios deben completarse.")
                 raise ValueError("Campos obligatorios incompletos.")
@@ -115,12 +111,10 @@ def agregar_pdu(request):
             clave = request.POST.get("clave") if admin else None
 
             if admin:
-                # Al menos un campo clave debe estar lleno
                 if not modelo_id:
                     messages.error(request, "Debe seleccionar un modelo.")
                     raise ValueError("Modelo no seleccionado.")
                 
-                #Validad duplicados
                 duplicado = controller.validar_dublicados(nfb, serie, ip)
                 if controller.mensaje_error_duplicado(request, duplicado, nfb, serie, ip):
                     raise ValueError("Duplicado detectado.")
@@ -128,21 +122,18 @@ def agregar_pdu(request):
             ubicacion = crear_ubicacion(tipo=tipo, nombre=nombre_ubicacion, ciudad_id=ciudad_id)
             regional_id = asignar_regional(tipo=tipo, ciudad_id=int(ciudad_id))
             
-            # Condicional para crear PDU
             if admin:
                 controller.crear_pdu_adm(modelo_id=modelo_id, ubicacion_id=ubicacion.id, regional_id=regional_id, nfb=nfb, serie=serie, ip=ip, usuario=usuario, clave=clave)
             else:
                 controller.crear_pdu_no_adm(ubicacion_id=ubicacion.id, regional_id=regional_id)
 
             messages.success(request, "✅ Agregado exitosamente.")
-            return redirect("pdu")  # redirige a la lista de PDUs
+            return redirect("pdu")
         except ValueError:
-            # Se manejan arriba con mensajes específicos
             pass
         except Exception as e:
             messages.error(request, f"Ocurrió un error al agregar el dispositivo: {e}")
         
-    # Si es GET, cargamos los datos usando los controladores
     modelos = listar_modelos()
     ciudades = listar_ciudad()
     regionales = listar_regionales()
@@ -187,7 +178,6 @@ def editar_pdu(request, pdu_id):
                     controller.mensaje_error_duplicado(request, duplicado, nfb, serie, ip)
                     raise ValueError("Duplicado detectado.")
 
-            # Actualizar ubicación
             pdu.ubicacion.tipo = tipo
             pdu.ubicacion.nombre = nombre_ubicacion
             pdu.ubicacion.ciudad_id = ciudad_id
@@ -218,16 +208,12 @@ def editar_pdu(request, pdu_id):
             return redirect("pdu")
 
         except ValueError:
-            # Mantener los parámetros actuales de la lista
-            referer = request.META.get("HTTP_REFERER", "/pdu/")  # URL previa o lista por defecto
+            referer = request.META.get("HTTP_REFERER", "/pdu/")
             url_parts = referer.split("?")
             base_url = url_parts[0]
             query = url_parts[1] if len(url_parts) > 1 else ""
-
-            # Convertimos los parámetros actuales en un dict
-            from urllib.parse import parse_qs, urlencode
             query_dict = parse_qs(query)
-            query_dict["modal_abierto"] = [pdu_id]  # forzamos el modal
+            query_dict["modal_abierto"] = [pdu_id]
 
             nueva_url = f"{base_url}?{urlencode(query_dict, doseq=True)}"
             return redirect(nueva_url)
@@ -235,7 +221,7 @@ def editar_pdu(request, pdu_id):
         except Exception as e:
             messages.error(request, f"Ocurrió un error al actualizar: {e}")
             return redirect("pdu")
-    # ✅ Si llega aquí, es un GET → mostrar formulario
+    
     return render(request, "pdu/editar_pdu.html", {"pdu": pdu})
             
 @login_required
@@ -255,13 +241,7 @@ def eliminar_pdu(request, ubicacion_id):
 @require_GET
 def ping_pdu(request, ip):
     print(f"IP: {ip}")
-    """
-    Hace ping ICMP a la IP y devuelve JSON con:
-    - activa: True/False
-    - tiempo_ms: tiempo de respuesta aproximado en milisegundos
-    """
     try:
-        # Para Linux (contenedor)
         output = subprocess.run(
             ["ping", "-c", "1", ip],
             capture_output=True,
@@ -269,11 +249,9 @@ def ping_pdu(request, ip):
         )
 
         if output.returncode == 0:
-            # Extraer tiempo de respuesta de la salida
-            # Ejemplo de línea: "64 bytes from 192.168.1.50: icmp_seq=1 ttl=64 time=1.23 ms"
-            line = output.stdout.splitlines()[1]  # segunda línea
+            line = output.stdout.splitlines()[1] 
             time_part = [p for p in line.split() if "time=" in p][0]
-            tiempo_ms = time_part.split("=")[1]  # "1.23"
+            tiempo_ms = time_part.split("=")[1]
             tiempo_ms = float(tiempo_ms)
             return JsonResponse({"activa": True, "tiempo_ms": tiempo_ms})
         else:

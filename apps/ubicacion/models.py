@@ -10,7 +10,7 @@ class Ubicacion(models.Model):
     ]
     
     tipo = models.CharField(max_length=100, choices=CHOICES_TIPO)
-    nombre = models.CharField(max_length=100) # Nombre de la ubicación
+    nombre = models.CharField(max_length=100)
     ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE)
     
     class Meta:

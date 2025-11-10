@@ -55,25 +55,20 @@ def cambiar_contraseña(request):
 
         referer = request.META.get("HTTP_REFERER", "/dashboard/")
 
-        # Validar contraseña actual
         if not user.check_password(old_password):
             messages.error(request, "La contraseña actual es incorrecta.", extra_tags="danger")
             return redirect(reconstruir_url(referer, "cambiarPasswordModal"))
 
-        # Validar que las nuevas coincidan
         if new_password1 != new_password2:
             messages.error(request, "Las nuevas contraseñas no coinciden.", extra_tags="danger")
             return redirect(reconstruir_url(referer, "cambiarPasswordModal"))
 
-        # Cambiar contraseña
         user.set_password(new_password1)
         user.cambiar_password = False
         user.save()
         update_session_auth_hash(request, user)
 
         messages.success(request, "Contraseña cambiada correctamente.", extra_tags="success")
-
-        # Redirigir a la misma página sin el modal
         return redirect(reconstruir_url(referer))
 
     return redirect('dashboard')
@@ -85,7 +80,6 @@ def gestion_usuarios(request):
     if request.user.id == 1:
         usuarios = obtener_usuarios()
     else:
-        # Oculta solo al admin principal
         usuarios = obtener_usuarios().exclude(id=1)
 
     for u in usuarios:
@@ -106,7 +100,6 @@ def crear_usuario(request):
         contraseña = request.POST.get('contraseña')
         rol = request.POST.get('rol')
 
-        # Evita duplicados
         if usuario_existe(usuario):
             messages.error(request, "❌ El nombre de usuario ya existe.", extra_tags="danger")
         else:
@@ -129,13 +122,11 @@ def editar_usuario(request, usuario_id):
         nuevo_estado = request.POST.get('estado')
         usuario_actual = request.user
 
-        # Verificar si el rol es válido para este usuario
         roles_permitidos = usuario_actual.puede_crear_roles()
         if nuevo_rol not in roles_permitidos:
             messages.error(request, "❌ No tienes permisos para asignar ese rol.", extra_tags="danger")
             return redirect('gestion_usuario')
 
-        # Si todo está bien, actualizar
         actualizar_usuario(usuario, nuevo_rol, nuevo_estado)
         messages.success(request, "✅ Usuario actualizado correctamente.", extra_tags="success")
         return redirect('gestion_usuario')

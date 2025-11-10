@@ -33,7 +33,7 @@ def listado_modelo(request):
 @login_required
 def agregar_modelo(request):
     if request.method == 'POST':
-        nombre = request.POST.get('nombre')
+        nombre = request.POST.get('nombre').upper()
         marca_id = request.POST.get('marca')
 
         if not nombre or not marca_id:

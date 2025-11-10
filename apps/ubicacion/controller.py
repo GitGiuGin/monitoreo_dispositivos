@@ -9,15 +9,9 @@ def crear_ubicacion(tipo, nombre, ciudad_id=None):
     )
 
 def listar_ubicaciones():
-    """
-    Retorna todas las ubicaciones.
-    """
     return Ubicacion.objects.select_related("ciudad").all()
 
 def obtener_ubicacion(ubicacion_id):
-    """
-    Retorna una ubicación específica.
-    """
     try:
         return Ubicacion.objects.select_related("ciudad").get(id=ubicacion_id)
     except Ubicacion.DoesNotExist:

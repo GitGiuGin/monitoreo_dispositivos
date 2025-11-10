@@ -5,6 +5,10 @@ class Marca(models.Model):
     CHOISES_DISPOSITIVO = [
         ('PDU', 'PDU'),
         ('UPS', 'UPS'),
+        ('SWITCH', 'SWITCH'),
+        ('IMPRESORA', 'IMPRESORA'),
+        ('AIRE ACONDICIONADO', 'AIRE ACONDICIONADO'),
+        ('SERVIDOR', 'SERVIDOR')
     ]
     dispositivo = models.CharField(max_length=50, choices=CHOISES_DISPOSITIVO)
     nombre = models.CharField(max_length=100)

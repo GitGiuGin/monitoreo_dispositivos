@@ -4,10 +4,7 @@ from apps.ciudad.models import Ciudad
 
 @receiver(post_migrate)
 def crear_ciudades(sender, **kwargs):
-    """
-    Crea automáticamente las 9 ciudades (departamentos de Bolivia)
-    después de migrar la base de datos.
-    """
+
     if sender.label != "ciudad":
         return
 

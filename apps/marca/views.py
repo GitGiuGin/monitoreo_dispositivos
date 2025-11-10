@@ -6,8 +6,8 @@ from .controller import crear_marca, marca_existe
 @login_required
 def agregar_marca(request):
     if request.method == 'POST':
-        dispositivo = request.POST.get('dispositivo')
-        nombre = request.POST.get('nombre')
+        dispositivo = request.POST.get('dispositivo').upper()
+        nombre = request.POST.get('nombre').upper()
 
         if not dispositivo or not nombre:
             messages.warning(request, 'Debe completar todos los campos.', extra_tags="warning")
