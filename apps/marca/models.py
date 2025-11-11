@@ -7,6 +7,7 @@ class Marca(models.Model):
         ('UPS', 'UPS'),
         ('SWITCH', 'SWITCH'),
         ('IMPRESORA', 'IMPRESORA'),
+        ('TELEFONO', 'TELEFONO'),
         ('AIRE ACONDICIONADO', 'AIRE ACONDICIONADO'),
         ('SERVIDOR', 'SERVIDOR')
     ]

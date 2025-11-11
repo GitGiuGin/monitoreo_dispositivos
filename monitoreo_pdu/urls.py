@@ -1,10 +1,8 @@
-from django.contrib import admin
 from django.urls import include, path
 from apps.usuario import views
 from .views import dashboard
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('', views.vista_login, name='login'),
     path('logout/', views.desconectar, name='logout'),
     path('dashboard/', dashboard, name='dashboard'),

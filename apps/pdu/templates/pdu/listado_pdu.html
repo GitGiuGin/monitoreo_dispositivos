@@ -3,7 +3,7 @@
 {% block content %}
 <div class="mt-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Listado de equipos</h2>
+        <h2>Listado de dispositivos</h2>
         {% if user.rol != 'USUARIO' %}
         <a href="{% url 'pdu_agregar' %}" class="btn btn-success">
             <i class="fa fa-plus"></i> Agregar dispositivo
@@ -159,7 +159,7 @@
                 </tr>
                 {% empty %}
                 <tr class="text-center">
-                    <td colspan="12">No hay PDUs registrados</td>
+                    <td colspan="12">No hay dispositivos registrados</td>
                 </tr>
                 {% endfor %}
             </tbody>
