@@ -12,14 +12,8 @@
     </div>
     <form method="get" class="row g-2 align-items-center mb-4 d-flex flex-wrap">
         <input type="hidden" name="page" value="{{ page_obj.number }}">
-        <div class="col-auto">
-            <input type="text" name="marca" value="{{ marca }}" class="form-control" placeholder="Marca">
-        </div>
-        <div class="col-auto">
-            <input type="text" name="nfb" value="{{ nfb }}" class="form-control" placeholder="NFB">
-        </div>
-        <div class="col-auto">
-            <input type="text" name="serie" value="{{ serie }}" class="form-control" placeholder="Serie">
+        <div class="col-12 col-md-5">
+            <input type="text" id="buscar" name="buscar" placeholder="Buscar dispositivo" class="form-control w-100">
         </div>
         <div class="col-auto">
             <select name="admin" class="form-control">
@@ -62,14 +56,14 @@
                 {% if page_obj.has_previous %}
                 <li class="page-item">
                     <a class="page-link"
-                        href="?page={{ page_obj.previous_page_number }}&items={{ items }}&marca={{ marca }}&nfb={{ nfb }}&serie={{ serie }}&admin={{ admin }}">Anterior</a>
+                        href="?page={{ num }}&items={{ items }}&buscar={{ buscar }}&admin={{ admin }}">Anterior</a>
                 </li>
                 {% endif %}
 
                 {% for num in rango_paginas %}
                 <li class="page-item {% if num == page_obj.number %}active{% endif %}">
                     <a class="page-link"
-                        href="?page={{ num }}&items={{ items }}&marca={{ marca }}&nfb={{ nfb }}&serie={{ serie }}&admin={{ admin }}">
+                        href="?page={{ num }}&items={{ items }}&buscar={{ buscar }}&admin={{ admin }}">
                         {{ num }}</a>
                 </li>
                 {% endfor %}
@@ -77,7 +71,7 @@
                 {% if page_obj.has_next %}
                 <li class="page-item">
                     <a class="page-link"
-                        href="?page={{ page_obj.next_page_number }}&items={{ items }}&marca={{ marca }}&nfb={{ nfb }}&serie={{ serie }}&admin={{ admin }}">Siguiente</a>
+                        href="?page={{ num }}&items={{ items }}&buscar={{ buscar }}&admin={{ admin }}">Siguiente</a>
                 </li>
                 {% endif %}
             </ul>
@@ -179,7 +173,6 @@
         </div>
     </div>
 </div>
-
 
 <script>
 document.getElementById('items').addEventListener('change', function() {

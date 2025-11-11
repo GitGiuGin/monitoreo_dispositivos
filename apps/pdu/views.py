@@ -18,9 +18,7 @@ def vista_pdu(request):
 
 @login_required
 def listado_pdu(request):
-    marca = request.GET.get('marca', '').strip()
-    nfb = request.GET.get('nfb', '').strip()
-    serie = request.GET.get('serie', '').strip()
+    buscar = request.GET.get('buscar', '').strip()
     admin = request.GET.get('admin', '').strip()
 
     pdus = controller.listado_pdu()
@@ -32,14 +30,18 @@ def listado_pdu(request):
         nfb_valor = getattr(pdu, 'nfb', '') or ''
         serie_valor = getattr(pdu, 'serie', '') or ''
         admin_valor = getattr(pdu, 'admin', False)
+        ubicacion_nombre = getattr(pdu.ubicacion, 'nombre', '') or ''
+        ciudad_nombre = getattr(getattr(pdu.ubicacion, 'ciudad', None), 'nombre', '') or ''
+        dispositivo = getattr(getattr(pdu.modelo, 'marca', None), 'dispositivo', '') or ''
+        ip_valor = getattr(pdu, 'ip', '') or ''
 
-        # Verificar coincidencias
-        if marca and marca.lower() not in (nombre_marca.lower() + ' ' + nombre_modelo.lower()):
-            continue
-        if nfb and nfb.lower() not in nfb_valor.lower():
-            continue
-        if serie and serie.lower() not in serie_valor.lower():
-            continue
+        if buscar:
+            texto = (
+                f"{nombre_marca} {nombre_modelo} {nfb_valor} {serie_valor} "
+                f"{ubicacion_nombre} {ciudad_nombre} {dispositivo} {ip_valor}"
+            ).lower()
+            if buscar.lower() not in texto:
+                continue
         if admin in ['True', 'False'] and admin_valor != (admin == 'True'):
             continue
 
@@ -78,9 +80,7 @@ def listado_pdu(request):
         'modelos': listar_modelos(),
         'ciudades': listar_ciudad(),
         'tipos': listar_tipos(),
-        'marca': marca,
-        'nfb': nfb,
-        'serie': serie,
+        'buscar': buscar,
         'admin': admin,
     }
 
